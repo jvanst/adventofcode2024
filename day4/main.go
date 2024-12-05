@@ -10,6 +10,7 @@ const INPUT = "input.txt"
 
 func main() {
 	partOne()
+	partTwo()
 }
 
 /*
@@ -68,8 +69,6 @@ func searchDown(lines []string, x int, y int) bool {
 		return false
 	}
 
-	fmt.Println('x', x, 'y', y)
-
 	return isMatch(string(lines[y][x]) + string(lines[y+1][x]) + string(lines[y+2][x]) + string(lines[y+3][x]))
 }
 
@@ -94,4 +93,47 @@ func isMatch(substring string) bool {
 		return true
 	}
 	return false
+}
+
+/*
+Part 2: Find all cases of two MAS in the shape of an X:
+
+Ex:
+M.S
+.A.
+M.S
+
+Solution: Iterate over each character, disregard all characters that are not "A".
+Then checks if character to the diagonal up/down left and diagonal up/down right is exist. If they do
+create a string with the characters and check if it's either "MAS" or "SAM". If it is, increment the total.
+*/
+func partTwo() {
+	fileContent, err := os.ReadFile(INPUT)
+	if err != nil {
+		fmt.Println("Error reading file:", err)
+		return
+	}
+
+	total := 0
+
+	lines := strings.Split(string(fileContent), "\n")
+
+	for y := 0; y < len(lines); y++ {
+		for x := 0; x < len(lines[y]); x++ {
+			if string(lines[y][x]) != "A" {
+				continue
+			}
+
+			if y-1 >= 0 && y+1 < len(lines) && x-1 >= 0 && x+1 < len(lines[y]) {
+				descending := string(lines[y-1][x-1]) + string(lines[y][x]) + string(lines[y+1][x+1])
+				accending := string(lines[y-1][x+1]) + string(lines[y][x]) + string(lines[y+1][x-1])
+
+				if (accending == "MAS" || accending == "SAM") && (descending == "MAS" || descending == "SAM") {
+					total += 1
+				}
+			}
+		}
+	}
+
+	fmt.Println("Part 2: ", total)
 }
